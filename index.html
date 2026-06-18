@@ -232,7 +232,7 @@ function startGame(){
   spawnTimer = 0;
   lastTime = performance.now();
   // base fall speed reduced by 40% from a normal ~250px/s baseline -> 150px/s
-  fallSpeed = H * 0.39;          // px per second (scaled to screen height) — 30% faster
+  fallSpeed = H * 0.507;         // px per second (scaled to screen height) — 30% faster again
   spawnInterval = 900;           // ms between beans
   updateHUD();
   requestAnimationFrame(loop);
