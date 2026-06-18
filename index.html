@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Bean Catch — World of Coffee</title>
+<style>
+  /* ============================================================
+     CONFIG / BRANDING — easy to tweak
+     ============================================================ */
+  :root{
+    --bg:#2b1a12;
+    --bg2:#3d2417;
+    --cream:#f4e9da;
+    --accent:#c98a4b;
+    --accent-dark:#8a5a2b;
+    --bean:#5a3415;          /* single brown bean color */
+    --good:#7bb661;
+    --bad:#d9534f;
+    --card:rgba(255,255,255,0.06);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 50% 0%,var(--bg2),var(--bg));
+    color:var(--cream);
+    overflow:hidden;
+    -webkit-user-select:none;user-select:none;
+    touch-action:none;
+  }
+  #app{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .screen{
+    position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+    padding:24px;text-align:center;gap:18px;overflow-y:auto;
+  }
+  .screen.active{display:flex;}
+  h1{font-size:clamp(26px,7vw,40px);margin:0;line-height:1.1;}
+  h2{font-size:clamp(20px,5.5vw,28px);margin:0;}
+  p{font-size:clamp(15px,4vw,18px);line-height:1.5;margin:0;max-width:520px;opacity:.92;}
+  .small{font-size:14px;opacity:.7;max-width:460px;}
+  .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.6;}
+  .btn{
+    background:var(--accent);color:#2b1a12;border:none;border-radius:40px;
+    padding:16px 34px;font-size:18px;font-weight:700;cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .1s;min-width:200px;
+  }
+  .btn:active{transform:scale(.96);}
+  .btn.secondary{background:transparent;border:2px solid var(--accent);color:var(--cream);}
+  .gender-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+  .gender-card{
+    background:var(--card);border:2px solid transparent;border-radius:20px;
+    padding:24px 28px;cursor:pointer;min-width:130px;transition:.15s;
+  }
+  .gender-card:active{transform:scale(.96);}
+  .gender-card .emoji{font-size:46px;}
+  .gender-card .lbl{margin-top:8px;font-size:18px;font-weight:600;}
+  .bean-input{
+    width:100%;max-width:380px;padding:14px 16px;border-radius:12px;border:none;
+    font-size:16px;background:rgba(255,255,255,.92);color:#2b1a12;
+  }
+  .field{width:100%;max-width:380px;text-align:left;}
+  .field label{font-size:13px;opacity:.7;display:block;margin-bottom:5px;margin-left:4px;}
+
+  /* HUD */
+  #hud{
+    position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
+    padding:14px 18px;font-size:18px;font-weight:700;z-index:5;pointer-events:none;
+    text-shadow:0 1px 3px rgba(0,0,0,.6);
+  }
+  #misses{display:flex;gap:6px;}
+  .miss-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--cream);}
+  .miss-dot.lost{background:var(--bad);border-color:var(--bad);}
+  canvas{display:block;width:100%;height:100%;}
+  #gameScreen{padding:0;}
+  .pill{background:var(--card);border-radius:14px;padding:14px 18px;max-width:480px;}
+  .prize{font-size:30px;}
+  .result-score{font-size:clamp(48px,16vw,90px);font-weight:800;color:var(--accent);line-height:1;}
+  .fade{animation:fade .4s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .note{font-size:13px;opacity:.75;font-style:italic;}
+  a.maplink{color:var(--accent);font-weight:700;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ WELCOME / STORY ============ -->
+  <section id="welcomeScreen" class="screen active">
+    <div class="logo">Bean Voyage &nbsp;×&nbsp; World of Coffee</div>
+    <h1>☕ Catch the Beans</h1>
+    <!-- ▼▼▼ STORY: edit the text inside STORY_HTML in the script below ▼▼▼ -->
+    <div id="storyBox" class="pill"></div>
+    <button class="btn" onclick="show('genderScreen')">Start</button>
+    <p class="small">Catch falling beans with your cup. Miss 3 and it's over. Compete, then come win a prize at our booth!</p>
+  </section>
+
+  <!-- ============ GENDER ============ -->
+  <section id="genderScreen" class="screen">
+    <h2>First, who's playing?</h2>
+    <div class="gender-row">
+      <div class="gender-card" onclick="chooseGender('male')">
+        <div class="emoji">👨</div><div class="lbl">Male</div>
+      </div>
+      <div class="gender-card" onclick="chooseGender('female')">
+        <div class="emoji">👩</div><div class="lbl">Female</div>
+      </div>
+    </div>
+    <p class="small">In coffee farming, women do much of the work — yet earn far less than men for the very same harvest. This game makes that gap impossible to ignore.</p>
+  </section>
+
+  <!-- ============ GAME ============ -->
+  <section id="gameScreen" class="screen">
+    <div id="hud">
+      <div>Score: <span id="scoreVal">0</span></div>
+      <div id="misses"></div>
+    </div>
+    <canvas id="canvas"></canvas>
+  </section>
+
+  <!-- ============ GAME OVER / CAPTURE ============ -->
+  <section id="overScreen" class="screen">
+    <h2>Time's up! ☕</h2>
+    <div class="result-score" id="finalScore">0</div>
+    <p id="genderMsg"></p>
+
+    <!-- shown until the player submits once -->
+    <div id="submitBlock" style="display:flex;flex-direction:column;gap:14px;align-items:center;width:100%;">
+      <div class="field">
+        <label>Name</label>
+        <input id="nameInput" class="bean-input" type="text" placeholder="Your name" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="emailInput" class="bean-input" type="email" placeholder="you@email.com" autocomplete="email">
+      </div>
+      <button class="btn" id="saveBtn" onclick="saveScore()">Submit my score</button>
+      <p class="small" id="saveStatus"></p>
+      <button class="btn secondary" onclick="startGame()">Play again</button>
+    </div>
+
+    <!-- shown after the player has already submitted (anti-spam) -->
+    <div id="alreadyBlock" style="display:none;flex-direction:column;gap:14px;align-items:center;width:100%;">
+      <p>You've already submitted your score on this device. Keep playing for fun — and come visit us at the booth!</p>
+      <button class="btn" onclick="show('boothScreen')">Booth info & prizes</button>
+      <button class="btn secondary" onclick="startGame()">Play again</button>
+    </div>
+  </section>
+
+  <!-- ============ BOOTH INVITE ============ -->
+  <section id="boothScreen" class="screen">
+    <div class="prize">🏆🎁☕</div>
+    <h2>Come say hi & win a prize!</h2>
+    <p>Your score is saved. Now find the <strong>Bean Voyage</strong> booth — we've got prizes to give away and we'd love to meet you.</p>
+    <div class="pill">
+      <p style="margin:0"><strong>📍 Find us at the Bean Voyage stand</strong></p>
+      <p class="small" style="margin-top:6px">Show this screen at the booth to enter the prize draw.</p>
+    </div>
+    <button class="btn secondary" onclick="restart()">Play again</button>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   ⚙️  CONFIG  — edit these
+   ============================================================ */
+const SUPABASE_URL  = "https://lbyuuzrqachfasxnxzoh.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxieXV1enJxYWNoZmFzeG54em9oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NzYzNzMsImV4cCI6MjA5NzM1MjM3M30.67CujW7Sv52RUF1mRThonJ5nQoPtolLXeDISjfW6oyY";
+const TABLE         = "scores";
+
+const POINTS_PER_BEAN   = 10;
+const FEMALE_MULTIPLIER = 0.7;   // women earn 30% less for the same catch
+const MAX_MISSES        = 3;
+
+/* ▼▼▼ EDIT YOUR STORY HERE — plain HTML allowed ▼▼▼ */
+const STORY_HTML = `
+  <p><strong>[ Your story goes here ]</strong></p>
+  <p class="small">Replace this with the message you want players to read before they start.</p>
+`;
+/* ▲▲▲ EDIT YOUR STORY HERE ▲▲▲ */
+
+document.getElementById('storyBox').innerHTML = STORY_HTML;
+
+/* ============================================================
+   STATE / NAVIGATION
+   ============================================================ */
+let gender = 'male';
+let beansCaught = 0;
+let finalScore = 0;
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active','fade');
+  setTimeout(()=>el.classList.remove('fade'),400);
+}
+function chooseGender(g){ gender = g; startGame(); }
+function restart(){
+  document.getElementById('saveStatus').textContent='';
+  document.getElementById('saveBtn').disabled=false;
+  document.getElementById('nameInput').value='';
+  document.getElementById('emailInput').value='';
+  show('welcomeScreen');
+}
+
+/* ============================================================
+   GAME
+   ============================================================ */
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = canvas.clientWidth; H = canvas.clientHeight;
+  canvas.width = W*DPR; canvas.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener('resize',resize);
+
+let cup, beans, misses, score, running, spawnTimer, lastTime, fallSpeed, spawnInterval;
+
+function startGame(){
+  show('gameScreen');
+  resize();
+  cup = { w: Math.max(70, W*0.20), h: 46, x: W/2 };
+  beans = [];
+  misses = 0;
+  score = 0;
+  beansCaught = 0;
+  running = true;
+  spawnTimer = 0;
+  lastTime = performance.now();
+  // base fall speed reduced by 40% from a normal ~250px/s baseline -> 150px/s
+  fallSpeed = H * 0.39;          // px per second (scaled to screen height) — 30% faster
+  spawnInterval = 900;           // ms between beans
+  updateHUD();
+  requestAnimationFrame(loop);
+}
+
+function spawnBean(){
+  const r = Math.max(14, W*0.035);
+  beans.push({ x: r + Math.random()*(W-2*r), y:-r, r:r, vy: fallSpeed*(0.85+Math.random()*0.4), rot:Math.random()*Math.PI });
+}
+
+function loop(now){
+  if(!running) return;
+  const dt = Math.min((now-lastTime)/1000, 0.05);
+  lastTime = now;
+  spawnTimer += dt*1000;
+  if(spawnTimer >= spawnInterval){ spawnTimer=0; spawnBean(); }
+
+  ctx.clearRect(0,0,W,H);
+
+  // beans
+  for(let i=beans.length-1;i>=0;i--){
+    const b = beans[i];
+    b.y += b.vy*dt;
+    b.rot += dt*1.5;
+    drawBean(b);
+
+    const cupTop = H - 70;
+    // catch check
+    if(b.y + b.r >= cupTop && b.y - b.r <= cupTop + cup.h){
+      if(b.x > cup.x - cup.w/2 && b.x < cup.x + cup.w/2){
+        beans.splice(i,1);
+        beansCaught++;
+        score += POINTS_PER_BEAN * (gender==='female'?FEMALE_MULTIPLIER:1);
+        score = Math.round(score);
+        updateHUD();
+        continue;
+      }
+    }
+    // missed (off bottom)
+    if(b.y - b.r > H){
+      beans.splice(i,1);
+      misses++;
+      updateHUD();
+      if(misses >= MAX_MISSES){ endGame(); return; }
+    }
+  }
+  drawCup();
+  requestAnimationFrame(loop);
+}
+
+function drawBean(b){
+  ctx.save();
+  ctx.translate(b.x,b.y);
+  ctx.rotate(b.rot);
+  // single brown bean
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bean').trim();
+  ctx.beginPath();
+  ctx.ellipse(0,0,b.r*0.7,b.r,0,0,Math.PI*2);
+  ctx.fill();
+  // center crease
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.lineWidth = Math.max(1.5,b.r*0.12);
+  ctx.beginPath();
+  ctx.moveTo(0,-b.r*0.8); ctx.quadraticCurveTo(b.r*0.25,0,0,b.r*0.8);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawCup(){
+  const x = cup.x, y = H-70, w=cup.w, h=cup.h;
+  ctx.save();
+  // cup body
+  ctx.fillStyle = '#f4e9da';
+  ctx.beginPath();
+  ctx.moveTo(x-w/2, y);
+  ctx.lineTo(x+w/2, y);
+  ctx.lineTo(x+w/2-w*0.12, y+h);
+  ctx.lineTo(x-w/2+w*0.12, y+h);
+  ctx.closePath();
+  ctx.fill();
+  // coffee surface
+  ctx.fillStyle = '#5a3415';
+  ctx.beginPath();
+  ctx.ellipse(x, y, w/2, 8, 0, 0, Math.PI*2);
+  ctx.fill();
+  // handle
+  ctx.strokeStyle = '#f4e9da';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.arc(x+w/2, y+h*0.35, 16, -Math.PI*0.5, Math.PI*0.5);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function updateHUD(){
+  document.getElementById('scoreVal').textContent = score;
+  const m = document.getElementById('misses');
+  m.innerHTML='';
+  for(let i=0;i<MAX_MISSES;i++){
+    const d=document.createElement('div');
+    d.className='miss-dot'+(i<misses?' lost':'');
+    m.appendChild(d);
+  }
+}
+
+// move cup with touch / mouse
+function moveCup(clientX){
+  if(!cup) return;
+  const rect = canvas.getBoundingClientRect();
+  let x = clientX - rect.left;
+  x = Math.max(cup.w/2, Math.min(W-cup.w/2, x));
+  cup.x = x;
+}
+canvas.addEventListener('touchmove', e=>{ e.preventDefault(); moveCup(e.touches[0].clientX); }, {passive:false});
+canvas.addEventListener('touchstart', e=>{ moveCup(e.touches[0].clientX); }, {passive:false});
+canvas.addEventListener('mousemove', e=> moveCup(e.clientX));
+
+function endGame(){
+  running = false;
+  finalScore = score;
+  document.getElementById('finalScore').textContent = finalScore;
+  const msg = document.getElementById('genderMsg');
+  if(gender==='female'){
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong>30% less</strong> for them. That's the reality women in coffee face every day. <span style="opacity:.8">Bean Voyage is working to change it.</span>`;
+  } else {
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong>30% less</strong>. Bean Voyage is working to change that.`;
+  }
+  // once submitted on this device, hide the submit form (anti-spam) — replay still allowed
+  const submitted = localStorage.getItem('beanSubmitted') === '1';
+  document.getElementById('submitBlock').style.display  = submitted ? 'none' : 'flex';
+  document.getElementById('alreadyBlock').style.display = submitted ? 'flex' : 'none';
+  show('overScreen');
+}
+
+/* ============================================================
+   SUPABASE SAVE
+   ============================================================ */
+async function saveScore(){
+  const btn = document.getElementById('saveBtn');
+  const status = document.getElementById('saveStatus');
+  const name = document.getElementById('nameInput').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  if(!name){ status.textContent='Please enter your name.'; return; }
+  btn.disabled = true;
+  status.textContent = 'Saving…';
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_ANON,
+        'Authorization':`Bearer ${SUPABASE_ANON}`,
+        'Prefer':'return=minimal'
+      },
+      body: JSON.stringify({ name, email, gender, score: finalScore, beans_caught: beansCaught })
+    });
+    if(!res.ok){ throw new Error('HTTP '+res.status+' '+await res.text()); }
+    localStorage.setItem('beanSubmitted','1');   // lock further submissions on this device
+    show('boothScreen');
+  }catch(err){
+    console.error(err);
+    status.textContent = 'Could not save (check connection). You can still visit the booth!';
+    btn.disabled = false;
+    // let them continue regardless
+    setTimeout(()=>show('boothScreen'), 1500);
+  }
+}
+</script>
+</body>
+</html>
