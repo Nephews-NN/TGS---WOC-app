@@ -61,6 +61,9 @@
   }
   .field{width:100%;max-width:380px;text-align:left;}
   .field label{font-size:13px;opacity:.7;display:block;margin-bottom:5px;margin-left:4px;}
+  .consent{display:flex;gap:10px;align-items:flex-start;max-width:380px;width:100%;text-align:left;font-size:13px;line-height:1.4;opacity:.9;cursor:pointer;}
+  .consent input{width:20px;height:20px;flex:0 0 auto;margin-top:1px;accent-color:var(--accent);}
+  .consent a{color:var(--accent);}
 
   /* HUD */
   #hud{
@@ -93,6 +96,7 @@
     <div id="storyBox" class="pill"></div>
     <button class="btn" onclick="show('genderScreen')">Start</button>
     <p class="small">Catch falling beans with your cup. Miss 3 and it's over. Compete, then come win a prize at our booth!</p>
+    <p class="small" id="playCount" style="opacity:.85"></p>
   </section>
 
   <!-- ============ GENDER ============ -->
@@ -124,8 +128,7 @@
     <div class="result-score" id="finalScore">0</div>
     <p id="genderMsg"></p>
 
-    <!-- shown until the player submits once -->
-    <div id="submitBlock" style="display:flex;flex-direction:column;gap:14px;align-items:center;width:100%;">
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;width:100%;">
       <div class="field">
         <label>Name</label>
         <input id="nameInput" class="bean-input" type="text" placeholder="Your name" autocomplete="name">
@@ -134,15 +137,12 @@
         <label>Email</label>
         <input id="emailInput" class="bean-input" type="email" placeholder="you@email.com" autocomplete="email">
       </div>
+      <label class="consent">
+        <input id="consentInput" type="checkbox">
+        <span>I agree that Bean Voyage / TGS may store my details and contact me about the prize draw and their work. <a href="#" onclick="return false;" style="opacity:.7">Privacy</a></span>
+      </label>
       <button class="btn" id="saveBtn" onclick="saveScore()">Submit my score</button>
       <p class="small" id="saveStatus"></p>
-      <button class="btn secondary" onclick="startGame()">Play again</button>
-    </div>
-
-    <!-- shown after the player has already submitted (anti-spam) -->
-    <div id="alreadyBlock" style="display:none;flex-direction:column;gap:14px;align-items:center;width:100%;">
-      <p>You've already submitted your score on this device. Keep playing for fun — and come visit us at the booth!</p>
-      <button class="btn" onclick="show('boothScreen')">Booth info & prizes</button>
       <button class="btn secondary" onclick="startGame()">Play again</button>
     </div>
   </section>
@@ -360,10 +360,6 @@ function endGame(){
   } else {
     msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong>30% less</strong>. Bean Voyage is working to change that.`;
   }
-  // once submitted on this device, hide the submit form (anti-spam) — replay still allowed
-  const submitted = localStorage.getItem('beanSubmitted') === '1';
-  document.getElementById('submitBlock').style.display  = submitted ? 'none' : 'flex';
-  document.getElementById('alreadyBlock').style.display = submitted ? 'flex' : 'none';
   show('overScreen');
 }
 
@@ -375,7 +371,9 @@ async function saveScore(){
   const status = document.getElementById('saveStatus');
   const name = document.getElementById('nameInput').value.trim();
   const email = document.getElementById('emailInput').value.trim();
+  const consent = document.getElementById('consentInput').checked;
   if(!name){ status.textContent='Please enter your name.'; return; }
+  if(!consent){ status.textContent='Please tick the consent box to submit your score.'; return; }
   btn.disabled = true;
   status.textContent = 'Saving…';
   try{
@@ -387,10 +385,10 @@ async function saveScore(){
         'Authorization':`Bearer ${SUPABASE_ANON}`,
         'Prefer':'return=minimal'
       },
-      body: JSON.stringify({ name, email, gender, score: finalScore, beans_caught: beansCaught })
+      body: JSON.stringify({ name, email, gender, score: finalScore, beans_caught: beansCaught, consent })
     });
     if(!res.ok){ throw new Error('HTTP '+res.status+' '+await res.text()); }
-    localStorage.setItem('beanSubmitted','1');   // lock further submissions on this device
+    fetchPlayCount();            // refresh the live counter
     show('boothScreen');
   }catch(err){
     console.error(err);
@@ -400,6 +398,31 @@ async function saveScore(){
     setTimeout(()=>show('boothScreen'), 1500);
   }
 }
+
+/* ============================================================
+   LIVE PLAY COUNTER  (reads a count-only RPC, no personal data)
+   ============================================================ */
+async function fetchPlayCount(){
+  const el = document.getElementById('playCount');
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/play_count`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_ANON,
+        'Authorization':`Bearer ${SUPABASE_ANON}`
+      },
+      body:'{}'
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const n = await res.json();
+    el.textContent = `🎮 ${Number(n).toLocaleString()} games played so far`;
+  }catch(err){ el.textContent=''; }   // stay silent if it can't load
+}
+fetchPlayCount();                                   // on first load
+setInterval(()=>{                                   // refresh while the welcome screen is visible
+  if(document.getElementById('welcomeScreen').classList.contains('active')) fetchPlayCount();
+}, 15000);
 </script>
 </body>
 </html>
