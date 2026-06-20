@@ -263,10 +263,10 @@ function loop(now){
   if(!running) return;
   const dt = Math.min((now-lastTime)/1000, 0.05);
   lastTime = now;
-  // accelerate: +10% fall speed every 10 seconds
+  // accelerate: +15% fall speed every 10 seconds
   gameTime += dt;
   const tier = Math.floor(gameTime/10);
-  if(tier > speedTier){ speedTier = tier; fallSpeed = baseFallSpeed * Math.pow(1.1, tier); }
+  if(tier > speedTier){ speedTier = tier; fallSpeed = baseFallSpeed * Math.pow(1.15, tier); }
   spawnTimer += dt*1000;
   if(spawnTimer >= spawnInterval){ spawnTimer=0; spawnBean(); }
 
