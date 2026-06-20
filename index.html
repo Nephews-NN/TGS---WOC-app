@@ -42,6 +42,7 @@
   h2{font-size:clamp(20px,5.5vw,28px);margin:0;color:var(--msg);}
   .msg{color:var(--msg);}            /* boodschap tekst (redbrown) */
   .hl{color:var(--hl);}              /* highlight woorden (orange) */
+  .story-head{font-size:clamp(24px,6.5vw,32px);line-height:1.15;}
   p{font-size:clamp(15px,4vw,18px);line-height:1.5;margin:0;max-width:520px;opacity:.92;}
   .small{font-size:14px;opacity:.7;max-width:460px;}
   .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.6;}
@@ -187,8 +188,8 @@ const MAX_MISSES        = 3;
 
 /* ▼▼▼ EDIT YOUR STORY HERE — plain HTML allowed ▼▼▼ */
 const STORY_HTML = `
-  <p class="msg"><strong>WELCOME to<br><span class="hl">World of Coffee</span></strong></p>
-  <p class="msg">Play the game<br>Visit our booth<br><span class="hl">Win awesome prizes</span></p>
+  <p class="story-head"><strong><span class="msg">WELCOME</span> <span class="hl">to<br>World of Coffee</span></strong></p>
+  <p class="hl">Play the game<br>Visit our booth<br>Win awesome prizes</p>
 `;
 /* ▲▲▲ EDIT YOUR STORY HERE ▲▲▲ */
 
