@@ -9,16 +9,18 @@
      CONFIG / BRANDING — easy to tweak
      ============================================================ */
   :root{
-    /* Huisstijl — 3 RAL kleuren */
-    --bg:#E9E0D2;            /* RAL 9001 cream — achtergrond */
-    --bg2:#F1EADF;           /* lichte crème variant voor verloop */
-    --cream:#1A1718;         /* RAL 8022 black brown — tekst1 (hoofdtekst) */
-    --accent:#E75B12;        /* RAL 2004 pure orange — tekst2 / accent */
-    --accent-dark:#B8470D;   /* donkerder oranje */
-    --bean:#1A1718;          /* RAL 8022 — koffiebonen */
-    --good:#E75B12;
-    --bad:#E75B12;           /* gemiste bonen = oranje stip */
-    --card:rgba(26,23,24,0.06);
+    /* Huisstijl kleuren */
+    --bg:#fffaf4;            /* cream — achtergrond */
+    --bg2:#fff5ea;           /* subtiele warme variant voor verloop */
+    --cream:#1a1718;         /* zwart — standaard/uitleg/checkbox/logo tekst */
+    --msg:#4c060e;           /* redbrown — boodschap tekst (type 1) */
+    --hl:#f25536;            /* orange — highlight woorden (type 2) */
+    --accent:#f25536;        /* orange accent — knoppen / kop */
+    --accent-dark:#d63d1f;
+    --bean:#4c060e;          /* redbrown koffiebonen */
+    --good:#f25536;
+    --bad:#f25536;           /* gemiste bonen = oranje stip */
+    --card:rgba(76,6,14,0.06);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;}
@@ -36,8 +38,10 @@
     padding:24px;text-align:center;gap:18px;overflow-y:auto;
   }
   .screen.active{display:flex;}
-  h1{font-size:clamp(26px,7vw,40px);margin:0;line-height:1.1;}
-  h2{font-size:clamp(20px,5.5vw,28px);margin:0;}
+  h1{font-size:clamp(26px,7vw,40px);margin:0;line-height:1.1;color:var(--msg);}
+  h2{font-size:clamp(20px,5.5vw,28px);margin:0;color:var(--msg);}
+  .msg{color:var(--msg);}            /* boodschap tekst (redbrown) */
+  .hl{color:var(--hl);}              /* highlight woorden (orange) */
   p{font-size:clamp(15px,4vw,18px);line-height:1.5;margin:0;max-width:520px;opacity:.92;}
   .small{font-size:14px;opacity:.7;max-width:460px;}
   .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.6;}
@@ -45,7 +49,7 @@
   .brand-logo{height:clamp(40px,11vw,56px);width:auto;object-fit:contain;}
   .logo-x{font-size:clamp(20px,5vw,26px);opacity:.55;font-weight:300;}
   .btn{
-    background:var(--accent);color:#E9E0D2;border:none;border-radius:40px;
+    background:var(--accent);color:#fffaf4;border:none;border-radius:40px;
     padding:16px 34px;font-size:18px;font-weight:700;cursor:pointer;
     box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .1s;min-width:200px;
   }
@@ -118,7 +122,7 @@
         <div class="emoji">👩</div>
       </div>
     </div>
-    <p class="small">In coffee farming, women do much of the work — yet earn far less than men for the very same harvest. This game makes that gap impossible to ignore.</p>
+    <p class="small msg">In coffee farming, women do much of the work — yet <span class="hl">earn far less</span> than men for the very same harvest. This game makes that <span class="hl">gap impossible to ignore</span>.</p>
   </section>
 
   <!-- ============ GAME ============ -->
@@ -134,7 +138,7 @@
   <section id="overScreen" class="screen">
     <h2>Time's up! ☕</h2>
     <div class="result-score" id="finalScore">0</div>
-    <p id="genderMsg"></p>
+    <p id="genderMsg" class="msg"></p>
 
     <div style="display:flex;flex-direction:column;gap:14px;align-items:center;width:100%;">
       <div class="field">
@@ -159,10 +163,10 @@
   <section id="boothScreen" class="screen">
     <div class="prize">🏆🎁☕</div>
     <h2>Good game!</h2>
-    <p>Your score is saved. Now find <strong>The God Shot</strong> at booth #11416.</p>
+    <p class="msg">Your score is saved. Now find <strong class="hl">The God Shot</strong> at <span class="hl">booth #11416</span>.</p>
     <div class="pill">
-      <p style="margin:0"><strong>📍 The God Shot — booth #11416</strong></p>
-      <p class="small" style="margin-top:6px">We'd love to meet you.<br>We give away prizes every day at 16h00 at our booth.<br>See you there!</p>
+      <p class="msg" style="margin:0"><strong>📍 The God Shot — <span class="hl">booth #11416</span></strong></p>
+      <p class="small msg" style="margin-top:6px">We'd love to meet you.<br>We give away prizes every day at <span class="hl">16h00</span> at our booth.<br>See you there!</p>
     </div>
     <button class="btn secondary" onclick="restart()">Play again</button>
   </section>
@@ -183,8 +187,8 @@ const MAX_MISSES        = 3;
 
 /* ▼▼▼ EDIT YOUR STORY HERE — plain HTML allowed ▼▼▼ */
 const STORY_HTML = `
-  <p><strong>WELCOME to<br>World of Coffee</strong></p>
-  <p>Play the game<br>Visit our booth<br>Win awesome prizes</p>
+  <p class="msg"><strong>WELCOME to<br><span class="hl">World of Coffee</span></strong></p>
+  <p class="msg">Play the game<br>Visit our booth<br><span class="hl">Win awesome prizes</span></p>
 `;
 /* ▲▲▲ EDIT YOUR STORY HERE ▲▲▲ */
 
@@ -320,7 +324,7 @@ function drawCup(){
   const x = cup.x, y = H-70, w=cup.w, h=cup.h;
   ctx.save();
   // cup body
-  ctx.fillStyle = '#E75B12';   // RAL 2004 orange
+  ctx.fillStyle = '#f25536';   // orange
   ctx.beginPath();
   ctx.moveTo(x-w/2, y);
   ctx.lineTo(x+w/2, y);
@@ -329,12 +333,12 @@ function drawCup(){
   ctx.closePath();
   ctx.fill();
   // coffee surface
-  ctx.fillStyle = '#1A1718';   // RAL 8022 black brown
+  ctx.fillStyle = '#4c060e';   // redbrown koffie
   ctx.beginPath();
   ctx.ellipse(x, y, w/2, 8, 0, 0, Math.PI*2);
   ctx.fill();
   // handle
-  ctx.strokeStyle = '#E75B12';
+  ctx.strokeStyle = '#f25536';
   ctx.lineWidth = 8;
   ctx.beginPath();
   ctx.arc(x+w/2, y+h*0.35, 16, -Math.PI*0.5, Math.PI*0.5);
@@ -371,9 +375,9 @@ function endGame(){
   document.getElementById('finalScore').textContent = finalScore;
   const msg = document.getElementById('genderMsg');
   if(gender==='female'){
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong>30% less</strong> for them. That's the reality women in coffee face every day. <span style="opacity:.8">Bean Voyage is working to change it.</span>`;
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong class="hl">30% less</strong> for them. That's the reality women in coffee face every day. <span style="opacity:.8">Bean Voyage is working to change it.</span>`;
   } else {
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong>30% less</strong>. Bean Voyage is working to change that.`;
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong class="hl">30% less</strong>. Bean Voyage is working to change that.`;
   }
   show('overScreen');
 }
