@@ -226,7 +226,7 @@ function resize(){
 }
 window.addEventListener('resize',resize);
 
-let cup, beans, misses, score, running, spawnTimer, lastTime, fallSpeed, spawnInterval;
+let cup, beans, misses, score, running, spawnTimer, lastTime, fallSpeed, spawnInterval, baseFallSpeed, gameTime, speedTier;
 
 function startGame(){
   show('gameScreen');
@@ -240,7 +240,10 @@ function startGame(){
   spawnTimer = 0;
   lastTime = performance.now();
   // base fall speed reduced by 40% from a normal ~250px/s baseline -> 150px/s
-  fallSpeed = H * 0.507;         // px per second (scaled to screen height) — 30% faster again
+  baseFallSpeed = H * 0.507;     // starting fall speed (px/s, scaled to screen height)
+  fallSpeed = baseFallSpeed;
+  gameTime = 0;                  // seconds elapsed
+  speedTier = 0;                 // +10% every 10s
   spawnInterval = 900;           // ms between beans
   updateHUD();
   requestAnimationFrame(loop);
@@ -255,6 +258,10 @@ function loop(now){
   if(!running) return;
   const dt = Math.min((now-lastTime)/1000, 0.05);
   lastTime = now;
+  // accelerate: +10% fall speed every 10 seconds
+  gameTime += dt;
+  const tier = Math.floor(gameTime/10);
+  if(tier > speedTier){ speedTier = tier; fallSpeed = baseFallSpeed * Math.pow(1.1, tier); }
   spawnTimer += dt*1000;
   if(spawnTimer >= spawnInterval){ spawnTimer=0; spawnBean(); }
 
