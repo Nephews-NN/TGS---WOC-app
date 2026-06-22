@@ -215,7 +215,8 @@ const MAX_MISSES        = 3;
 // Bag image (drop a file named bag.png in this folder). Tweak these to fit:
 const BAG_IMAGE      = 'bag.png';
 const BAG_WIDTH_MULT = 2.6;      // bag width = catch-width × this (bigger = readable text)
-const BAG_MOUTH_FRAC = 0.40;     // how far down the image the opening sits (align with catch line)
+const BAG_MOUTH_FRAC = 0.26;     // how far down the image the opening sits (align with catch line)
+const BAG_CATCH_FRAC = 0.09;     // drop the catch line below the rim to meet the visible opening
 
 /* ▼▼▼ EDIT YOUR STORY HERE — plain HTML allowed ▼▼▼ */
 const STORY_HTML = `
@@ -317,7 +318,10 @@ function loop(now){
     b.rot += dt*1.5;
     drawBean(b);
 
-    const cupTop = H - 70;
+    let cupTop = H - 70;
+    if(bagReady && bagImg.naturalWidth){
+      cupTop += BAG_CATCH_FRAC * (cup.w*BAG_WIDTH_MULT) * (bagImg.naturalHeight/bagImg.naturalWidth);
+    }
     // catch check
     if(b.y + b.r >= cupTop && b.y - b.r <= cupTop + cup.h){
       if(b.x > cup.x - cup.w/2 && b.x < cup.x + cup.w/2){
