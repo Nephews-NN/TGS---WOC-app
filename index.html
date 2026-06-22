@@ -417,9 +417,9 @@ function endGame(){
   document.getElementById('finalScore').textContent = finalScore;
   const msg = document.getElementById('genderMsg');
   if(gender==='female'){
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong class="hl">30% less</strong> for them. That's the reality women in coffee face every day. <span style="opacity:.8">Bean Voyage is working to change it.</span>`;
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong class="hl">30% less</strong> for them. That's the reality women in coffee face every day. <strong class="hl">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   } else {
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong class="hl">30% less</strong>. Bean Voyage is working to change that.`;
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong class="hl">30% less</strong>. <strong class="hl">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   }
   show('overScreen');
   document.getElementById('msgModal').style.display='flex';   // popup right after the game
