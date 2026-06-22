@@ -620,6 +620,7 @@ async function saveScore(){
   const email = document.getElementById('emailInput').value.trim();
   const consent = document.getElementById('consentInput').checked;
   if(!name){ status.textContent='Please enter your name.'; return; }
+  if(!email || !email.includes('@') || !email.includes('.')){ status.textContent='Please enter a valid email.'; return; }
   if(!consent){ status.textContent='Please tick the consent box to submit your score.'; return; }
   btn.disabled = true;
   status.textContent = 'Saving…';
@@ -689,7 +690,7 @@ async function fetchTopScores(){
     const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     el.innerHTML = '<div class="hs-title">🏆 Top 3</div>' + rows.map((r,i)=>{
       const who = r.gender==='female' ? '👩' : '👨';
-      const name = esc(r.name).trim() || 'Anonymous';
+      const name = (esc(r.name).trim().split(/\s+/)[0]) || 'Anonymous';   // first name only (privacy)
       return `<div class="hs-row"><span class="rank">${medals[i]||(i+1)}</span><span class="who">${who}</span><span class="name">${name}</span><span class="score">${Number(r.score).toLocaleString()}</span></div>`;
     }).join('');
   }catch(err){ el.innerHTML=''; }   // stay silent if it can't load

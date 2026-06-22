@@ -42,7 +42,16 @@ returns table(name text, gender text, score integer)
 language sql
 security definer
 set search_path = public
-as $$ select name, gender, score from public.scores order by beans_caught desc nulls last, created_at asc limit 3 $$;
+as $$
+  select name, gender, score from (
+    select distinct on (lower(btrim(email))) name, gender, score, beans_caught, created_at
+    from public.scores
+    where email is not null and btrim(email) <> ''
+    order by lower(btrim(email)), beans_caught desc nulls last, created_at asc
+  ) t
+  order by t.beans_caught desc nulls last, t.created_at asc
+  limit 3
+$$;
 
 grant execute on function public.top_scores() to anon;
 
