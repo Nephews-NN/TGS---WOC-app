@@ -42,6 +42,7 @@
   h2{font-size:clamp(20px,5.5vw,28px);margin:0;color:var(--msg);}
   .msg{color:var(--msg);}            /* boodschap tekst (redbrown) */
   .hl{color:var(--hl);}              /* highlight woorden (orange) */
+  .bigmsg{color:var(--msg);font-size:1.25em;}   /* redbrown, groter, vet via <strong> */
   .story-head{font-size:clamp(24px,6.5vw,32px);line-height:1.15;}
   .hs{width:100%;max-width:300px;display:flex;flex-direction:column;gap:8px;}
   .hs-title{font-weight:800;color:var(--msg);font-size:18px;letter-spacing:.5px;}
@@ -446,9 +447,9 @@ function endGame(){
   document.getElementById('finalScore').textContent = finalScore;
   const msg = document.getElementById('genderMsg');
   if(gender==='female'){
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong class="hl">30% less</strong> for them. That's the reality women in coffee face every day. <strong class="hl">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong class="hl">30% less</strong> for them. That's the reality women in coffee face every day. <strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   } else {
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong class="hl">30% less</strong>. <strong class="hl">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
+    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong class="hl">30% less</strong>. <strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   }
   show('overScreen');
   document.getElementById('msgModal').style.display='flex';   // popup right after the game
