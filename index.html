@@ -17,7 +17,7 @@
     --hl:#f25536;            /* orange — highlight woorden (type 2) */
     --accent:#f25536;        /* orange accent — knoppen / kop */
     --accent-dark:#d63d1f;
-    --bean:#4c060e;          /* redbrown koffiebonen */
+    --bean:#7c9a46;          /* groene koffiebonen (farming stage) */
     --good:#f25536;
     --bad:#f25536;           /* gemiste bonen = oranje stip */
     --card:rgba(76,6,14,0.06);
@@ -349,42 +349,71 @@ function drawBean(b){
 }
 
 function drawCup(){
-  // coffee bean bag — opening (catch line) stays at y = H-70
-  const x = cup.x, y = H-70, w=cup.w, h=cup.h+10;
+  // burlap coffee-bean sack — opening (catch line) stays at y = H-70
+  const x = cup.x, y = H-70, w=cup.w, h=cup.h+14;
   ctx.save();
-  // bag body (slightly tapered sack with rounded bottom)
-  ctx.fillStyle = '#f25536';   // orange
+
+  // sack body (burlap), bulging sides with rounded bottom
+  ctx.fillStyle = '#c8b489';
   ctx.beginPath();
-  ctx.moveTo(x-w/2, y);
-  ctx.lineTo(x+w/2, y);
-  ctx.lineTo(x+w*0.42, y+h);
-  ctx.quadraticCurveTo(x, y+h+5, x-w*0.42, y+h);
+  ctx.moveTo(x-w/2, y+2);
+  ctx.quadraticCurveTo(x-w*0.60, y+h*0.5, x-w*0.42, y+h);
+  ctx.quadraticCurveTo(x, y+h+7, x+w*0.42, y+h);
+  ctx.quadraticCurveTo(x+w*0.60, y+h*0.5, x+w/2, y+2);
   ctx.closePath();
   ctx.fill();
-  // cream label
-  const lw=w*0.42, lh=h*0.34, ly=y+h*0.40;
-  ctx.fillStyle = '#fffaf4';
-  ctx.fillRect(x-lw/2, ly, lw, lh);
-  // little coffee bean on the label
-  ctx.fillStyle = '#4c060e';
+
+  // burlap weave hint + bottom shadow
+  ctx.strokeStyle = 'rgba(110,90,55,0.18)';
+  ctx.lineWidth = 1;
+  for(let i=-2;i<=2;i++){
+    ctx.beginPath();
+    ctx.moveTo(x+i*w*0.16, y+10);
+    ctx.lineTo(x+i*w*0.13, y+h-2);
+    ctx.stroke();
+  }
+  ctx.fillStyle = 'rgba(110,90,55,0.12)';
   ctx.beginPath();
-  ctx.ellipse(x, ly+lh/2, lw*0.15, lh*0.42, 0, 0, Math.PI*2);
+  ctx.ellipse(x, y+h-2, w*0.40, 6, 0,0,Math.PI*2);
   ctx.fill();
-  ctx.strokeStyle = '#fffaf4';
-  ctx.lineWidth = Math.max(1, lh*0.06);
+
+  // round cream label with a little green bean
+  ctx.fillStyle = '#f7efdd';
   ctx.beginPath();
-  ctx.moveTo(x, ly+lh*0.12); ctx.lineTo(x, ly+lh*0.88);
-  ctx.stroke();
-  // folded top rim (darker orange)
-  ctx.fillStyle = '#d63d1f';
-  ctx.beginPath();
-  ctx.ellipse(x, y, w/2, 8, 0, 0, Math.PI*2);
+  ctx.arc(x, y+h*0.58, w*0.20, 0, Math.PI*2);
   ctx.fill();
-  // open mouth (redbrown) where the beans fall in
-  ctx.fillStyle = '#4c060e';
+  ctx.strokeStyle = '#b89a5a'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.fillStyle = '#6f8f3f';
   ctx.beginPath();
-  ctx.ellipse(x, y-1, w*0.45, 6, 0, 0, Math.PI*2);
+  ctx.ellipse(x, y+h*0.58, w*0.055, w*0.085, 0,0,Math.PI*2);
   ctx.fill();
+
+  // folded rolled rim (lighter burlap)
+  ctx.fillStyle = '#dccaa0';
+  ctx.beginPath();
+  ctx.ellipse(x, y, w*0.54, 12, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(110,90,55,0.30)'; ctx.lineWidth = 1.5; ctx.stroke();
+  // inner opening shadow
+  ctx.fillStyle = '#b6a374';
+  ctx.beginPath();
+  ctx.ellipse(x, y-1, w*0.44, 8, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // green beans piled in the opening
+  const pile=[[-0.30,1],[-0.12,-2],[0.06,-1],[0.26,1],[-0.20,-4],[0.00,-5],[0.18,-3],[-0.05,-8],[0.11,-7]];
+  for(const [dx,dy] of pile){
+    ctx.save();
+    ctx.translate(x+dx*w, y-3+dy);
+    ctx.rotate(dx);
+    ctx.fillStyle = (dy<-4) ? '#86a651' : '#6f9140';
+    ctx.beginPath();
+    ctx.ellipse(0,0, w*0.075, w*0.055, 0,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(40,60,20,0.35)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,-w*0.05); ctx.lineTo(0,w*0.05); ctx.stroke();
+    ctx.restore();
+  }
   ctx.restore();
 }
 
