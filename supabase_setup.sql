@@ -57,6 +57,21 @@ grant execute on function public.top_scores() to anon;
 
 
 -- ============================================================
+-- LAUNCH / HARDENING — run once before going live
+-- ============================================================
+-- 1) wipe test data + reset the id sequence back to 1
+truncate table public.scores restart identity;
+
+-- 2) bound public inserts so the anon key can't store garbage / oversized data
+alter table public.scores
+  add constraint score_range  check (score >= 0 and score <= 100000),
+  add constraint beans_range  check (beans_caught is null or (beans_caught >= 0 and beans_caught <= 100000)),
+  add constraint name_len     check (char_length(name) between 1 and 60),
+  add constraint email_len    check (email is null or char_length(email) <= 120),
+  add constraint consent_true check (consent = true);   -- no row stored without consent (GDPR)
+
+
+-- ============================================================
 -- MIGRATION — run ONLY this part if the table already exists
 -- ============================================================
 -- alter table public.scores add column if not exists consent boolean not null default false;
