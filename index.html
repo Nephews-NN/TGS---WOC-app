@@ -5,27 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Bean Catch — World of Coffee</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=DM+Sans:wght@400;500;600;700&display=swap');
   /* ============================================================
-     CONFIG / BRANDING — easy to tweak
+     CONFIG / BRANDING — huisstijl kleuren
      ============================================================ */
   :root{
-    /* Huisstijl kleuren */
     --bg:#fffaf4;            /* cream — achtergrond */
     --bg2:#fff5ea;           /* subtiele warme variant voor verloop */
-    --cream:#1a1718;         /* zwart — standaard/uitleg/checkbox/logo tekst */
-    --msg:#4c060e;           /* redbrown — boodschap tekst (type 1) */
-    --hl:#f25536;            /* orange — highlight woorden (type 2) */
-    --accent:#f25536;        /* orange accent — knoppen / kop */
+    --surface:#fff7ef;       /* warm-white kaarten */
+    --cream:#4c060e;         /* redbrown ink — standaard tekst */
+    --msg:#4c060e;           /* redbrown — boodschap tekst */
+    --ink-soft:#9a7268;      /* gedempte tekst */
+    --hl:#f25536;            /* orange — highlight (type 2) */
+    --accent:#f25536;        /* orange accent — knoppen */
     --accent-dark:#d63d1f;
+    --accent-pale:#fbe6df;   /* zachte oranje tint (chips/callouts) */
     --bean:#7c9a46;          /* groene koffiebonen (farming stage) */
     --good:#f25536;
     --bad:#f25536;           /* gemiste bonen = oranje stip */
-    --card:rgba(76,6,14,0.06);
+    --card:rgba(76,6,14,0.05);
+    --border:rgba(76,6,14,0.10);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:'DM Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:radial-gradient(circle at 50% 0%,var(--bg2),var(--bg));
     color:var(--cream);
     overflow:hidden;
@@ -34,12 +38,14 @@
   }
   #app{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
   .screen{
-    position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
-    padding:24px;text-align:center;gap:18px;overflow-y:auto;
+    position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:flex-start;
+    padding:34px 24px 48px;text-align:center;gap:18px;overflow-y:auto;
   }
   .screen.active{display:flex;}
-  h1{font-size:clamp(26px,7vw,40px);margin:0;line-height:1.1;color:var(--msg);}
-  h2{font-size:clamp(20px,5.5vw,28px);margin:0;color:var(--msg);}
+  /* vertically center shorter screens */
+  #genderScreen, #overScreen, #boothScreen{justify-content:center;}
+  h1{font-family:'Fraunces',Georgia,serif;font-size:clamp(26px,7vw,36px);margin:0;line-height:1.1;color:var(--msg);font-weight:700;}
+  h2{font-family:'Fraunces',Georgia,serif;font-size:clamp(20px,5.5vw,27px);margin:0;color:var(--msg);font-weight:600;}
   .msg{color:var(--msg);}            /* boodschap tekst (redbrown) */
   .hl{color:var(--hl);}              /* highlight woorden (orange) */
   .bigmsg{color:var(--msg);font-size:1.25em;}   /* redbrown, groter, vet via <strong> */
@@ -47,7 +53,7 @@
   .hs{width:100%;max-width:300px;display:flex;flex-direction:column;gap:8px;}
   .hs-title{font-weight:800;color:var(--msg);font-size:18px;letter-spacing:.5px;}
   .hs-row{display:flex;align-items:center;gap:14px;font-size:22px;font-weight:800;
-    background:var(--card);border-radius:12px;padding:8px 16px;color:var(--msg);}
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 16px;color:var(--msg);}
   .hs-row .rank{font-size:20px;}
   .hs-row .who{font-size:24px;}
   .hs-row .score{margin-left:auto;color:var(--hl);}
@@ -57,10 +63,34 @@
     display:flex;flex-direction:column;gap:16px;text-align:center;box-shadow:0 16px 50px rgba(0,0,0,.35);}
   .modal-logo{height:clamp(46px,12vw,62px);width:auto;object-fit:contain;align-self:center;}
   /* Bean Voyage mission strip (welcome) */
-  .mission{background:var(--card);border-left:4px solid var(--hl);border-radius:10px;
-    padding:14px 16px;max-width:420px;width:100%;text-align:left;}
-  .mission p{font-size:14px;line-height:1.55;color:var(--msg);}
+  .mission{display:flex;gap:12px;align-items:flex-start;background:var(--accent-pale);
+    border-radius:14px;padding:16px 18px;max-width:400px;width:100%;text-align:left;}
+  .mission .m-icon{width:30px;height:30px;border-radius:50%;background:#fff;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .mission p{font-size:13.5px;line-height:1.55;color:var(--msg);}
+  .mission .m-head{display:block;font-weight:700;color:var(--msg);margin-bottom:2px;}
   .mission strong{color:var(--hl);}
+  /* welcome card + steps */
+  .welcome-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    padding:26px 22px;text-align:center;max-width:400px;width:100%;}
+  .welcome-card h1 em{font-style:italic;color:var(--hl);}
+  .event-tag{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);margin-top:8px;display:block;}
+  .steps{list-style:none;padding:16px 0 0;margin:18px 0 0;display:flex;flex-direction:column;
+    gap:11px;text-align:left;border-top:1px solid var(--border);}
+  .steps li{display:flex;align-items:center;gap:11px;font-size:15px;color:var(--msg);}
+  .steps strong{color:var(--hl);}
+  .step-icon{width:30px;height:30px;border-radius:50%;background:var(--accent-pale);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:15px;}
+  /* fact callout (gender) */
+  .fact-callout{background:var(--accent-pale);border-left:4px solid var(--accent);border-radius:10px;
+    padding:15px 17px;max-width:400px;width:100%;text-align:left;}
+  .fact-callout p{font-size:14.5px;line-height:1.6;color:var(--msg);font-weight:500;}
+  .fact-callout strong{color:var(--hl);font-weight:700;}
+  /* game title row */
+  .game-title-row{display:flex;align-items:center;justify-content:center;gap:10px;}
+  .bean-emoji{font-size:26px;}
+  .stat-bar{font-size:13px;color:var(--ink-soft);}
   /* wage-gap bars (popup) */
   .gap{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin:2px auto;}
   .gap-row{text-align:left;}
@@ -77,25 +107,30 @@
   .brand-logo{height:clamp(40px,11vw,56px);width:auto;object-fit:contain;}
   .logo-x{font-size:clamp(20px,5vw,26px);opacity:.55;font-weight:300;}
   .btn{
-    background:var(--accent);color:#fffaf4;border:none;border-radius:40px;
-    padding:16px 34px;font-size:18px;font-weight:700;cursor:pointer;
-    box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .1s;min-width:200px;
+    font-family:'DM Sans',sans-serif;
+    background:var(--accent);color:#fff;border:none;border-radius:50px;
+    padding:15px 34px;font-size:16px;font-weight:600;cursor:pointer;
+    box-shadow:0 6px 18px rgba(242,85,54,.25);transition:transform .12s,background .15s;
+    width:100%;max-width:360px;
   }
-  .btn:active{transform:scale(.96);}
+  .btn:active{transform:scale(.97);background:var(--accent-dark);}
   a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;}
-  .btn.secondary{background:transparent;border:2px solid var(--accent);color:var(--cream);}
+  .btn.secondary{background:transparent;border:2px solid var(--msg);color:var(--msg);box-shadow:none;}
   .gender-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
   .gender-card{
-    background:var(--card);border:2px solid transparent;border-radius:20px;
-    padding:24px 28px;cursor:pointer;min-width:130px;transition:.15s;
+    background:var(--surface);border:2px solid var(--border);border-radius:18px;
+    padding:24px 30px;cursor:pointer;min-width:128px;transition:.15s;
   }
+  .gender-card:hover{border-color:var(--accent);}
   .gender-card:active{transform:scale(.96);}
-  .gender-card .emoji{font-size:46px;}
-  .gender-card .lbl{margin-top:8px;font-size:18px;font-weight:600;}
+  .gender-card .emoji{font-size:44px;}
+  .gender-card .lbl{margin-top:8px;font-size:14px;font-weight:600;color:var(--msg);}
   .bean-input{
-    width:100%;max-width:380px;padding:14px 16px;border-radius:12px;border:none;
-    font-size:16px;background:rgba(255,255,255,.92);color:#2b1a12;
+    width:100%;max-width:380px;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);
+    font-size:16px;background:var(--surface);color:var(--msg);outline:none;transition:border-color .15s;
+    font-family:'DM Sans',sans-serif;
   }
+  .bean-input:focus{border-color:var(--accent);}
   .field{width:100%;max-width:380px;text-align:left;}
   .field label{font-size:13px;opacity:.7;display:block;margin-bottom:5px;margin-left:4px;}
   .consent{display:flex;gap:10px;align-items:flex-start;max-width:380px;width:100%;text-align:left;font-size:13px;line-height:1.4;opacity:.9;cursor:pointer;}
@@ -117,7 +152,7 @@
   .cd-label{font-size:clamp(18px,5.5vw,26px);font-weight:800;color:var(--msg);}
   .cd-num{font-size:clamp(72px,24vw,130px);font-weight:800;color:var(--hl);line-height:1;}
   #gameScreen{padding:0;}
-  .pill{background:var(--card);border-radius:14px;padding:14px 18px;max-width:480px;}
+  .pill{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;max-width:420px;}
   .prize{font-size:30px;}
   .result-score{font-size:clamp(48px,16vw,90px);font-weight:800;color:var(--accent);line-height:1;}
   .fade{animation:fade .4s ease;}
@@ -136,20 +171,33 @@
       <span class="logo-x">×</span>
       <img src="logo-godshot-dark.png" alt="The God Shot" class="brand-logo">
     </div>
-    <!-- ▼▼▼ STORY: edit the text inside STORY_HTML in the script below ▼▼▼ -->
-    <div id="storyBox" class="pill"></div>
-    <div class="mission">
-      <p><strong>Women grow most of the world's coffee</strong> — yet earn far less than men for the same harvest. Closing that gap empowers women farmers and strengthens entire local economies and the coffee industry. <strong>Bean Voyage</strong> is making it happen.</p>
+    <div class="welcome-card">
+      <h1>Welcome to<br><em>World of Coffee</em></h1>
+      <ul class="steps">
+        <li><span class="step-icon">☕</span> Play "Catch the Beans"</li>
+        <li><span class="step-icon">📍</span> Visit our booth <strong>#11416</strong></li>
+        <li><span class="step-icon">🎁</span> Win real prizes</li>
+      </ul>
     </div>
-    <h1>☕ Catch the Beans</h1>
-    <button class="btn" onclick="show('genderScreen')">Start</button>
-    <p class="small">Catch falling beans with your coffee bag. Miss 3 and it's over. Compete, then come win a prize at our booth!</p>
-    <p class="small" id="playCount" style="opacity:.85"></p>
+
+    <div class="mission">
+      <span class="m-icon">♀</span>
+      <p><span class="m-head">Women grow most of the world's coffee.</span>They earn far less than men for the same harvest. Closing that gap empowers women farmers and strengthens local economies and the whole coffee industry — <strong>Bean Voyage</strong> is making it happen.</p>
+    </div>
+
+    <div class="game-title-row">
+      <span class="bean-emoji">🫘</span>
+      <h1>Catch the Beans</h1>
+    </div>
+
+    <button class="btn" onclick="show('genderScreen')">Start playing</button>
+    <p class="stat-bar" id="playCount"></p>
   </section>
 
   <!-- ============ GENDER ============ -->
   <section id="genderScreen" class="screen">
     <h2>First, who's playing?</h2>
+    <p class="small" style="color:var(--ink-soft);max-width:300px;">This shapes how your score gap is shown — it's part of the message.</p>
     <div class="gender-row">
       <div class="gender-card" onclick="chooseGender('male')" aria-label="Male">
         <div class="emoji">👨</div>
@@ -158,7 +206,9 @@
         <div class="emoji">👩</div>
       </div>
     </div>
-    <p class="small msg" style="font-weight:700;font-size:19.6px;">In coffee farming, women do much of the work — yet <span class="hl">earn far less</span> than men for the very same harvest. This game makes that <span class="hl">gap impossible to ignore</span>.</p>
+    <div class="fact-callout">
+      <p>In coffee farming, women do much of the work — yet <strong>earn far less</strong> than men for the very same harvest. Your score will make that <strong>gap impossible to ignore</strong>.</p>
+    </div>
   </section>
 
   <!-- ============ GAME ============ -->
@@ -245,15 +295,6 @@ const BAG_WIDTH_MULT = 1.8;      // bag width = catch-width × this (bigger = re
 const BAG_MOUTH_FRAC = 0.14;     // how far down the image the opening sits (align with catch line)
 const BAG_OPENING_Y = 0.14;      // bean-surface height as fraction of the bag image (0=top,1=bottom)
 const BAG_OPENING_W = 0.60;      // opening width as fraction of the drawn bag width
-
-/* ▼▼▼ EDIT YOUR STORY HERE — plain HTML allowed ▼▼▼ */
-const STORY_HTML = `
-  <p class="story-head"><strong><span class="msg">WELCOME to</span><br><span class="hl">World of Coffee</span></strong></p>
-  <p class="msg"><strong class="hl">Play</strong> the game<br><strong class="hl">Visit</strong> our booth<br><strong class="hl">Win</strong> awesome prizes</p>
-`;
-/* ▲▲▲ EDIT YOUR STORY HERE ▲▲▲ */
-
-document.getElementById('storyBox').innerHTML = STORY_HTML;
 
 /* ============================================================
    STATE / NAVIGATION
