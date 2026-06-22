@@ -63,6 +63,8 @@
   .modal-card{background:var(--bg);border-radius:22px;padding:30px 24px;max-width:440px;width:100%;
     display:flex;flex-direction:column;gap:16px;text-align:center;box-shadow:0 16px 50px rgba(0,0,0,.35);}
   .modal-logo{height:clamp(46px,12vw,62px);width:auto;object-fit:contain;align-self:center;}
+  .qr-card{max-width:380px;}
+  .qr-img{width:min(74vw,320px);height:auto;align-self:center;background:#fff;padding:12px;border-radius:14px;}
   /* Bean Voyage mission strip (welcome) */
   .mission{display:flex;gap:12px;align-items:flex-start;background:var(--accent-pale);
     border-radius:14px;padding:16px 18px;max-width:400px;width:100%;text-align:left;}
@@ -267,6 +269,7 @@
     </div>
     <a class="btn" href="https://www.beanvoyage.org/" target="_blank" rel="noopener">Bean Voyage</a>
     <a class="btn" href="https://www.thegodshot.be/nl" target="_blank" rel="noopener">The God Shot</a>
+    <button class="btn" onclick="openQR()">Share QR</button>
     <button class="btn secondary" onclick="restart()">Play again</button>
   </section>
 
@@ -278,6 +281,16 @@
       <div id="gapBars" class="gap"></div>
       <p id="bvMessage" class="small msg"></p>
       <button class="btn" onclick="closeMsgModal()">Continue</button>
+    </div>
+  </div>
+
+  <!-- ============ QR CODE POPUP ============ -->
+  <div id="qrModal" class="modal-overlay" style="display:none" onclick="closeQR(event)">
+    <div class="modal-card qr-card">
+      <h2>Scan to play</h2>
+      <img src="booth-qr.png" alt="QR code to the game" class="qr-img">
+      <p class="small msg">Point a phone camera at the code to open the game.</p>
+      <button class="btn" onclick="closeQR()">Close</button>
     </div>
   </div>
 
@@ -317,6 +330,8 @@ function show(id){
   if(id==='overScreen') fetchTopScores();
 }
 function closeMsgModal(){ document.getElementById('msgModal').style.display='none'; }
+function openQR(){ document.getElementById('qrModal').style.display='flex'; }
+function closeQR(e){ if(e && e.currentTarget!==e.target) return; document.getElementById('qrModal').style.display='none'; }
 function chooseGender(g){ gender = g; startGame(); }
 function restart(){
   document.getElementById('saveStatus').textContent='';
