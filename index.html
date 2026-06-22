@@ -112,6 +112,10 @@
   .miss-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--cream);}
   .miss-dot.lost{background:var(--bad);border-color:var(--bad);}
   canvas{display:block;width:100%;height:100%;}
+  .countdown{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:10px;background:rgba(255,250,244,0.92);z-index:7;}
+  .cd-label{font-size:clamp(18px,5.5vw,26px);font-weight:800;color:var(--msg);}
+  .cd-num{font-size:clamp(72px,24vw,130px);font-weight:800;color:var(--hl);line-height:1;}
   #gameScreen{padding:0;}
   .pill{background:var(--card);border-radius:14px;padding:14px 18px;max-width:480px;}
   .prize{font-size:30px;}
@@ -164,6 +168,10 @@
       <div id="misses"></div>
     </div>
     <canvas id="canvas"></canvas>
+    <div id="countdown" class="countdown" style="display:none">
+      <div class="cd-label">Ready to play?</div>
+      <div class="cd-num">3</div>
+    </div>
   </section>
 
   <!-- ============ GAME OVER / CAPTURE ============ -->
@@ -300,9 +308,8 @@ function startGame(){
   misses = 0;
   score = 0;
   beansCaught = 0;
-  running = true;
+  running = false;               // wait for the countdown
   spawnTimer = 0;
-  lastTime = performance.now();
   // base fall speed reduced by 40% from a normal ~250px/s baseline -> 150px/s
   baseFallSpeed = H * 0.507;     // starting fall speed (px/s, scaled to screen height)
   fallSpeed = baseFallSpeed;
@@ -310,7 +317,30 @@ function startGame(){
   speedTier = 0;                 // +10% every 10s
   spawnInterval = 900;           // ms between beans
   updateHUD();
-  requestAnimationFrame(loop);
+  // draw the static bag behind the countdown
+  ctx.clearRect(0,0,W,H);
+  drawCup();
+  runCountdown();
+}
+
+function runCountdown(){
+  const overlay = document.getElementById('countdown');
+  const num = overlay.querySelector('.cd-num');
+  overlay.style.display = 'flex';
+  let n = 3;
+  num.textContent = n;
+  const tick = setInterval(()=>{
+    n--;
+    if(n <= 0){
+      clearInterval(tick);
+      overlay.style.display = 'none';
+      running = true;
+      lastTime = performance.now();
+      requestAnimationFrame(loop);
+    } else {
+      num.textContent = n;
+    }
+  }, 800);
 }
 
 function spawnBean(){
