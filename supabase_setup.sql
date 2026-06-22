@@ -35,13 +35,13 @@ as $$ select count(*)::int from public.scores $$;
 
 grant execute on function public.play_count() to anon;
 
--- Top-3 function: returns ONLY gender + score (no names/emails) for the leaderboard.
+-- Top-3 function: returns name + gender + score (no emails) for the leaderboard.
 create or replace function public.top_scores()
-returns table(gender text, score integer)
+returns table(name text, gender text, score integer)
 language sql
 security definer
 set search_path = public
-as $$ select gender, score from public.scores order by score desc, created_at asc limit 3 $$;
+as $$ select name, gender, score from public.scores order by score desc, created_at asc limit 3 $$;
 
 grant execute on function public.top_scores() to anon;
 
