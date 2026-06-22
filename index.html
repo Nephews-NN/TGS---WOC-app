@@ -216,7 +216,7 @@ const MAX_MISSES        = 3;
 const BAG_IMAGE      = 'bag.png';
 const BAG_WIDTH_MULT = 2.6;      // bag width = catch-width × this (bigger = readable text)
 const BAG_MOUTH_FRAC = 0.26;     // how far down the image the opening sits (align with catch line)
-const BAG_CATCH_FRAC = 0.30;     // drop the catch line below the rim to meet the visible opening
+const BAG_CATCH_FRAC = 0.06;     // line where beans vanish = bean surface in the bag (below rim ref)
 
 /* ▼▼▼ EDIT YOUR STORY HERE — plain HTML allowed ▼▼▼ */
 const STORY_HTML = `
@@ -320,27 +320,26 @@ function loop(now){
     b.rot += dt*1.5;
     drawBean(b);
 
-    let cupTop = H - 70;
+    // the "disappear line" — the bean surface inside the bag
+    let lineY = H - 70;
     if(bagReady && bagImg.naturalWidth){
-      cupTop += BAG_CATCH_FRAC * (cup.w*BAG_WIDTH_MULT) * (bagImg.naturalHeight/bagImg.naturalWidth);
+      lineY += BAG_CATCH_FRAC * (cup.w*BAG_WIDTH_MULT) * (bagImg.naturalHeight/bagImg.naturalWidth);
     }
-    // catch check
-    if(b.y + b.r >= cupTop && b.y - b.r <= cupTop + cup.h){
-      if(b.x > cup.x - cup.w/2 && b.x < cup.x + cup.w/2){
-        beans.splice(i,1);
+    // when a bean reaches the line it always disappears: caught if over the bag, else missed
+    if(b.y >= lineY){
+      const caught = (b.x > cup.x - cup.w/2 && b.x < cup.x + cup.w/2);
+      beans.splice(i,1);
+      if(caught){
         beansCaught++;
         score += POINTS_PER_BEAN * (gender==='female'?FEMALE_MULTIPLIER:1);
         score = Math.round(score);
         updateHUD();
-        continue;
+      } else {
+        misses++;
+        updateHUD();
+        if(misses >= MAX_MISSES){ endGame(); return; }
       }
-    }
-    // missed (off bottom)
-    if(b.y - b.r > H){
-      beans.splice(i,1);
-      misses++;
-      updateHUD();
-      if(misses >= MAX_MISSES){ endGame(); return; }
+      continue;
     }
   }
   requestAnimationFrame(loop);
