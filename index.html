@@ -43,6 +43,13 @@
   .msg{color:var(--msg);}            /* boodschap tekst (redbrown) */
   .hl{color:var(--hl);}              /* highlight woorden (orange) */
   .story-head{font-size:clamp(24px,6.5vw,32px);line-height:1.15;}
+  .hs{width:100%;max-width:300px;display:flex;flex-direction:column;gap:8px;}
+  .hs-title{font-weight:800;color:var(--msg);font-size:18px;letter-spacing:.5px;}
+  .hs-row{display:flex;align-items:center;gap:14px;font-size:22px;font-weight:800;
+    background:var(--card);border-radius:12px;padding:8px 16px;color:var(--msg);}
+  .hs-row .rank{font-size:20px;}
+  .hs-row .who{font-size:24px;}
+  .hs-row .score{margin-left:auto;color:var(--hl);}
   p{font-size:clamp(15px,4vw,18px);line-height:1.5;margin:0;max-width:520px;opacity:.92;}
   .small{font-size:14px;opacity:.7;max-width:460px;}
   .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.6;}
@@ -169,6 +176,7 @@
       <p class="msg" style="margin:0"><strong>📍 The God Shot — <span class="hl">booth #11416</span></strong></p>
       <p class="small msg" style="margin-top:6px">We'd love to meet you.<br>We give away prizes every day at <span class="hl">16h00</span> at our booth.<br>See you there!</p>
     </div>
+    <div id="highscores" class="hs"></div>
     <button class="btn secondary" onclick="restart()">Play again</button>
   </section>
 
@@ -207,6 +215,7 @@ function show(id){
   const el = document.getElementById(id);
   el.classList.add('active','fade');
   setTimeout(()=>el.classList.remove('fade'),400);
+  if(id==='boothScreen') fetchTopScores();
 }
 function chooseGender(g){ gender = g; startGame(); }
 function restart(){
@@ -439,6 +448,33 @@ async function fetchPlayCount(){
     el.textContent = `🎮 ${Number(n).toLocaleString()} games played so far`;
   }catch(err){ el.textContent=''; }   // stay silent if it can't load
 }
+/* ============================================================
+   TOP 3 HIGHSCORES  (gender + score only, no names)
+   ============================================================ */
+async function fetchTopScores(){
+  const el = document.getElementById('highscores');
+  if(!el) return;
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/top_scores`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_ANON,
+        'Authorization':`Bearer ${SUPABASE_ANON}`
+      },
+      body:'{}'
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const rows = await res.json();
+    if(!Array.isArray(rows) || !rows.length){ el.innerHTML=''; return; }
+    const medals=['🥇','🥈','🥉'];
+    el.innerHTML = '<div class="hs-title">🏆 Top 3</div>' + rows.map((r,i)=>{
+      const who = r.gender==='female' ? '👩' : '👨';
+      return `<div class="hs-row"><span class="rank">${medals[i]||(i+1)}</span><span class="who">${who}</span><span class="score">${Number(r.score).toLocaleString()}</span></div>`;
+    }).join('');
+  }catch(err){ el.innerHTML=''; }   // stay silent if it can't load
+}
+
 fetchPlayCount();                                   // on first load
 setInterval(()=>{                                   // refresh while the welcome screen is visible
   if(document.getElementById('welcomeScreen').classList.contains('active')) fetchPlayCount();
