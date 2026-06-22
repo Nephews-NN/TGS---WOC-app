@@ -212,6 +212,11 @@ const POINTS_PER_BEAN   = 10;
 const FEMALE_MULTIPLIER = 0.7;   // women earn 30% less for the same catch
 const MAX_MISSES        = 3;
 
+// Bag image (drop a file named bag.png in this folder). Tweak these to fit:
+const BAG_IMAGE      = 'bag.png';
+const BAG_WIDTH_MULT = 2.6;      // bag width = catch-width × this (bigger = readable text)
+const BAG_MOUTH_FRAC = 0.26;     // how far down the image the opening sits (align with catch line)
+
 /* ▼▼▼ EDIT YOUR STORY HERE — plain HTML allowed ▼▼▼ */
 const STORY_HTML = `
   <p class="story-head"><strong><span class="msg">WELCOME to</span><br><span class="hl">World of Coffee</span></strong></p>
@@ -250,6 +255,11 @@ function restart(){
    ============================================================ */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+// bag sprite (falls back to drawn bag until/unless it loads)
+const bagImg = new Image();
+let bagReady = false;
+bagImg.onload = ()=>{ bagReady = true; };
+bagImg.src = BAG_IMAGE;
 let W=0,H=0,DPR=1;
 function resize(){
   DPR = Math.min(window.devicePixelRatio||1, 2);
@@ -352,6 +362,15 @@ function drawBean(b){
 function drawCup(){
   // burlap coffee-bean sack — opening (catch line) stays at y = H-70
   const x = cup.x, y = H-70, w=cup.w, h=cup.h+14;
+
+  // use the photo bag if it loaded; opening aligned with the catch line
+  if(bagReady && bagImg.naturalWidth){
+    const dw = cup.w * BAG_WIDTH_MULT;
+    const dh = dw * (bagImg.naturalHeight / bagImg.naturalWidth);
+    ctx.drawImage(bagImg, x - dw/2, y - dh*BAG_MOUTH_FRAC, dw, dh);
+    return;
+  }
+
   ctx.save();
 
   // sack body (burlap), bulging sides with rounded bottom
