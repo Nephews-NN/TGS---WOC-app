@@ -54,7 +54,8 @@
   .modal-overlay{position:fixed;inset:0;background:rgba(26,23,24,0.55);display:flex;
     align-items:center;justify-content:center;padding:24px;z-index:100;animation:fade .25s ease;}
   .modal-card{background:var(--bg);border-radius:22px;padding:30px 24px;max-width:440px;width:100%;
-    display:flex;flex-direction:column;gap:20px;text-align:center;box-shadow:0 16px 50px rgba(0,0,0,.35);}
+    display:flex;flex-direction:column;gap:16px;text-align:center;box-shadow:0 16px 50px rgba(0,0,0,.35);}
+  .modal-logo{height:clamp(46px,12vw,62px);width:auto;object-fit:contain;align-self:center;}
   p{font-size:clamp(15px,4vw,18px);line-height:1.5;margin:0;max-width:520px;opacity:.92;}
   .small{font-size:14px;opacity:.7;max-width:460px;}
   .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.6;}
@@ -192,7 +193,8 @@
   <!-- ============ MESSAGE POPUP (shown right after the game) ============ -->
   <div id="msgModal" class="modal-overlay" style="display:none">
     <div class="modal-card">
-      <div class="prize">⚖️☕</div>
+      <img src="logo-beanvoyage-stacked-dark.png" alt="Bean Voyage" class="modal-logo">
+      <div class="prize">⚖️</div>
       <p id="genderMsg" class="msg"></p>
       <button class="btn" onclick="closeMsgModal()">Continue</button>
     </div>
@@ -474,9 +476,11 @@ function endGame(){
   document.getElementById('finalScore').textContent = finalScore;
   const msg = document.getElementById('genderMsg');
   if(gender==='female'){
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans — but earned <strong class="hl">30% less</strong> for them. That's the reality women in coffee face every day.<br><strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
+    const otherScore = Math.round(finalScore / FEMALE_MULTIPLIER);   // what men earn for the same work
+    msg.innerHTML = `You scored <strong class="hl">${finalScore}</strong> points 👩 — but men earn <strong class="hl">${otherScore}</strong> points 👨 for the same work.<br>That's the reality women in coffee farming face every day.<br><strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   } else {
-    msg.innerHTML = `You caught <strong>${beansCaught}</strong> beans and earned full points. A woman catching the same would earn <strong class="hl">30% less</strong>.<br><strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
+    const otherScore = Math.round(finalScore * FEMALE_MULTIPLIER);   // what women earn for the same work
+    msg.innerHTML = `You scored <strong class="hl">${finalScore}</strong> points 👨 — lucky for you, women earn just <strong class="hl">${otherScore}</strong> points 👩 for the same work.<br>That's the reality women in coffee farming face every day.<br><strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   }
   show('overScreen');
   document.getElementById('msgModal').style.display='flex';   // popup right after the game
