@@ -56,20 +56,6 @@
   .modal-card{background:var(--bg);border-radius:22px;padding:30px 24px;max-width:440px;width:100%;
     display:flex;flex-direction:column;gap:16px;text-align:center;box-shadow:0 16px 50px rgba(0,0,0,.35);}
   .modal-logo{height:clamp(46px,12vw,62px);width:auto;object-fit:contain;align-self:center;}
-  /* Bean Voyage mission strip (welcome) */
-  .mission{background:var(--card);border-left:4px solid var(--hl);border-radius:10px;
-    padding:14px 16px;max-width:420px;width:100%;text-align:left;}
-  .mission p{font-size:14px;line-height:1.55;color:var(--msg);}
-  .mission strong{color:var(--hl);}
-  /* wage-gap bars (popup) */
-  .gap{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin:2px auto;}
-  .gap-row{text-align:left;}
-  .gap-row .lab{font-size:13px;font-weight:700;color:var(--msg);display:flex;justify-content:space-between;margin-bottom:4px;}
-  .gap-track{height:15px;background:rgba(76,6,14,0.10);border-radius:8px;overflow:hidden;}
-  .gap-fill{height:100%;border-radius:8px;width:0;transition:width .9s ease;}
-  .gap-fill.other{background:var(--msg);}
-  .gap-fill.you{background:var(--hl);}
-  .bv-link{color:var(--hl);font-weight:700;text-decoration:underline;}
   p{font-size:clamp(15px,4vw,18px);line-height:1.5;margin:0;max-width:520px;opacity:.92;}
   .small{font-size:14px;opacity:.7;max-width:460px;}
   .logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;opacity:.6;}
@@ -134,9 +120,6 @@
     </div>
     <!-- ▼▼▼ STORY: edit the text inside STORY_HTML in the script below ▼▼▼ -->
     <div id="storyBox" class="pill"></div>
-    <div class="mission">
-      <p><strong>Women grow most of the world's coffee</strong> — yet earn far less than men for the same harvest. Closing that gap empowers women farmers and strengthens entire local economies and the coffee industry. <strong>Bean Voyage</strong> is making it happen.</p>
-    </div>
     <h1>☕ Catch the Beans</h1>
     <button class="btn" onclick="show('genderScreen')">Start</button>
     <p class="small">Catch falling beans with your coffee bag. Miss 3 and it's over. Compete, then come win a prize at our booth!</p>
@@ -211,8 +194,6 @@
     <div class="modal-card">
       <img src="logo-beanvoyage-stacked-dark.png" alt="Bean Voyage" class="modal-logo">
       <p id="genderMsg" class="msg"></p>
-      <div id="gapBars" class="gap"></div>
-      <p id="bvMessage" class="small msg"></p>
       <button class="btn" onclick="closeMsgModal()">Continue</button>
     </div>
   </div>
@@ -492,30 +473,15 @@ function endGame(){
   finalScore = score;
   document.getElementById('finalScore').textContent = finalScore;
   const msg = document.getElementById('genderMsg');
-  // men always earn full points; women earn 30% less for the SAME beans caught
-  const menScore   = (gender==='female') ? Math.round(finalScore / FEMALE_MULTIPLIER) : finalScore;
-  const womenScore = (gender==='female') ? finalScore : Math.round(finalScore * FEMALE_MULTIPLIER);
   if(gender==='female'){
-    msg.innerHTML = `You scored <strong class="hl">${finalScore}</strong> 👩 — a man earns <strong class="hl">${menScore}</strong> 👨 for the exact same work.`;
+    const otherScore = Math.round(finalScore / FEMALE_MULTIPLIER);   // what men earn for the same work
+    msg.innerHTML = `You scored <strong class="hl">${finalScore}</strong> points 👩 — but men earn <strong class="hl">${otherScore}</strong> points 👨 for the same work.<br>That's the reality women in coffee farming face every day.<br><strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   } else {
-    msg.innerHTML = `You scored <strong class="hl">${finalScore}</strong> 👨 — a woman earns just <strong class="hl">${womenScore}</strong> 👩 for the exact same work.`;
+    const otherScore = Math.round(finalScore * FEMALE_MULTIPLIER);   // what women earn for the same work
+    msg.innerHTML = `You scored <strong class="hl">${finalScore}</strong> points 👨 — lucky for you, women earn just <strong class="hl">${otherScore}</strong> points 👩 for the same work.<br>That's the reality women in coffee farming face every day.<br><strong class="bigmsg">Bean Voyage is working to change this.</strong><br>The God Shot is supporting this initiative.`;
   }
-  // wage-gap bars
-  const womenPct = menScore>0 ? Math.round(womenScore/menScore*100) : 0;
-  document.getElementById('gapBars').innerHTML =
-    `<div class="gap-row">
-       <div class="lab"><span>👨 Men${gender!=='female'?' (you)':''}</span><span>${menScore}</span></div>
-       <div class="gap-track"><div class="gap-fill other" data-w="100"></div></div>
-     </div>
-     <div class="gap-row">
-       <div class="lab"><span>👩 Women${gender==='female'?' (you)':''}</span><span>${womenScore}</span></div>
-       <div class="gap-track"><div class="gap-fill you" data-w="${womenPct}"></div></div>
-     </div>`;
-  document.getElementById('bvMessage').innerHTML =
-    `That's the reality women in coffee farming face every day. Closing this gap empowers women and strengthens local economies and the whole coffee industry. <strong class="bigmsg" style="display:block;margin:8px 0 4px;">Bean Voyage is working to change this.</strong> The God Shot proudly supports it — learn more at <a href="https://www.beanvoyage.org/" target="_blank" rel="noopener" class="bv-link">beanvoyage.org</a>.`;
   show('overScreen');
   document.getElementById('msgModal').style.display='flex';   // popup right after the game
-  setTimeout(()=>{ document.querySelectorAll('#gapBars .gap-fill').forEach(f=>{ f.style.width=f.dataset.w+'%'; }); }, 150);
 }
 
 /* ============================================================
