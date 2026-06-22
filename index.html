@@ -349,28 +349,42 @@ function drawBean(b){
 }
 
 function drawCup(){
-  const x = cup.x, y = H-70, w=cup.w, h=cup.h;
+  // coffee bean bag — opening (catch line) stays at y = H-70
+  const x = cup.x, y = H-70, w=cup.w, h=cup.h+10;
   ctx.save();
-  // cup body
+  // bag body (slightly tapered sack with rounded bottom)
   ctx.fillStyle = '#f25536';   // orange
   ctx.beginPath();
   ctx.moveTo(x-w/2, y);
   ctx.lineTo(x+w/2, y);
-  ctx.lineTo(x+w/2-w*0.12, y+h);
-  ctx.lineTo(x-w/2+w*0.12, y+h);
+  ctx.lineTo(x+w*0.42, y+h);
+  ctx.quadraticCurveTo(x, y+h+5, x-w*0.42, y+h);
   ctx.closePath();
   ctx.fill();
-  // coffee surface
-  ctx.fillStyle = '#4c060e';   // redbrown koffie
+  // cream label
+  const lw=w*0.42, lh=h*0.34, ly=y+h*0.40;
+  ctx.fillStyle = '#fffaf4';
+  ctx.fillRect(x-lw/2, ly, lw, lh);
+  // little coffee bean on the label
+  ctx.fillStyle = '#4c060e';
+  ctx.beginPath();
+  ctx.ellipse(x, ly+lh/2, lw*0.15, lh*0.42, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = '#fffaf4';
+  ctx.lineWidth = Math.max(1, lh*0.06);
+  ctx.beginPath();
+  ctx.moveTo(x, ly+lh*0.12); ctx.lineTo(x, ly+lh*0.88);
+  ctx.stroke();
+  // folded top rim (darker orange)
+  ctx.fillStyle = '#d63d1f';
   ctx.beginPath();
   ctx.ellipse(x, y, w/2, 8, 0, 0, Math.PI*2);
   ctx.fill();
-  // handle
-  ctx.strokeStyle = '#f25536';
-  ctx.lineWidth = 8;
+  // open mouth (redbrown) where the beans fall in
+  ctx.fillStyle = '#4c060e';
   ctx.beginPath();
-  ctx.arc(x+w/2, y+h*0.35, 16, -Math.PI*0.5, Math.PI*0.5);
-  ctx.stroke();
+  ctx.ellipse(x, y-1, w*0.45, 6, 0, 0, Math.PI*2);
+  ctx.fill();
   ctx.restore();
 }
 
