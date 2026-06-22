@@ -231,9 +231,6 @@
   <section id="overScreen" class="screen">
     <h2>Time's up!</h2>
     <div class="result-score" id="finalScore">0</div>
-    <div id="highscores" class="hs"></div>
-
-    <p class="small" style="max-width:390px;color:var(--ink-soft);">Today's <strong style="color:var(--msg)">top 3 scores</strong> win roasted beans from The God Shot shop — <strong style="color:var(--msg)">1 kg · 500 g · 250 g</strong>. Winners are contacted afterwards. <a href="https://www.thegodshot.be/nl/shop" target="_blank" rel="noopener" class="bv-link">Visit the shop</a></p>
 
     <p class="msg" style="font-weight:700;font-size:17px;">Enter your info below to join today's prize draw</p>
     <div class="fact-callout">
@@ -262,10 +259,12 @@
   <!-- ============ BOOTH INVITE ============ -->
   <section id="boothScreen" class="screen">
     <h2>Good game!</h2>
-    <p class="msg">Your score is saved. Now find <strong class="hl">The God Shot</strong> at <span class="hl">booth #11416</span>.</p>
+    <p class="msg">Your score is saved — see where you rank!</p>
+    <div id="highscores" class="hs"></div>
+    <p class="small" style="max-width:390px;color:var(--ink-soft);">Today's <strong style="color:var(--msg)">top 3 scores</strong> win roasted beans from The God Shot shop — <strong style="color:var(--msg)">1 kg · 500 g · 250 g</strong>. Winners are contacted afterwards. <a href="https://www.thegodshot.be/nl/shop" target="_blank" rel="noopener" class="bv-link">Visit the shop</a></p>
     <div class="pill">
       <p class="msg" style="margin:0"><strong>📍 The God Shot — <span class="hl">booth #11416</span></strong></p>
-      <p class="small msg" style="margin-top:8px">Every day at <strong class="hl">4:00 PM</strong> we randomly draw <strong class="hl">3 winners</strong> at <strong class="hl">booth #11416</strong> — be present to claim your prize!<br><br>Today's <strong>top 3 game scores</strong> win roasted beans from our shop (1 kg · 500 g · 250 g) — we'll contact you.</p>
+      <p class="small msg" style="margin-top:8px">Every day at <strong class="hl">4:00 PM</strong> we randomly draw <strong class="hl">3 winners</strong> at <strong class="hl">booth #11416</strong> — be present to claim your prize!</p>
     </div>
     <a class="btn" href="https://www.beanvoyage.org/" target="_blank" rel="noopener">Bean Voyage</a>
     <a class="btn" href="https://www.thegodshot.be/nl" target="_blank" rel="noopener">The God Shot</a>
@@ -327,7 +326,7 @@ function show(id){
   const el = document.getElementById(id);
   el.classList.add('active','fade');
   setTimeout(()=>el.classList.remove('fade'),400);
-  if(id==='overScreen') fetchTopScores();
+  if(id==='boothScreen') fetchTopScores();
 }
 function closeMsgModal(){ document.getElementById('msgModal').style.display='none'; }
 function openQR(){ document.getElementById('qrModal').style.display='flex'; }
