@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Welcome — A3 print (landscape)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=DM+Sans:wght@400;600&display=swap');
+
+  @page { size: A3 landscape; margin: 0; }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{
+    background:#ffffff;                 /* geen achtergrondkleur — wit voor print */
+    -webkit-print-color-adjust:exact;   /* zorg dat de merkkleuren printen */
+    print-color-adjust:exact;
+    font-family:'DM Sans',sans-serif;
+  }
+
+  .page{
+    width:420mm; min-height:297mm;       /* A3 liggend */
+    margin:0 auto;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:26mm; padding:30mm;
+  }
+
+  .logos{
+    display:flex; align-items:center; justify-content:center; gap:30mm;
+  }
+  .logos img{ height:64mm; width:auto; }
+  .logos .x{ font-size:36mm; line-height:1; color:#4c060e; font-weight:300; }
+
+  h1{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:700;
+    font-size:54mm;
+    line-height:1.04;
+    text-align:center;
+    color:#4c060e;                       /* redbruin */
+  }
+  h1 em{ font-style:italic; color:#f25536; }  /* oranje accent */
+
+  /* op het scherm een lichte kadering zodat je de A3-pagina ziet; verdwijnt bij printen */
+  @media screen{
+    body{ background:#e9e4dc; padding:20px; }
+    .page{ background:#fff; box-shadow:0 4px 30px rgba(0,0,0,.15); }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="logos">
+      <img src="logo-beanvoyage-stacked-dark.png" alt="Bean Voyage">
+      <span class="x">×</span>
+      <img src="logo-godshot-dark.png" alt="The God Shot">
+    </div>
+    <h1>Welcome to <em>World of Coffee</em></h1>
+  </div>
+</body>
+</html>
